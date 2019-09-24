@@ -1,5 +1,18 @@
 pragma solidity ^0.4.17;
 
+contract CampaignFactory {
+  address[] public deployedCampaign;
+
+  function createCampaign(uint minimun) public {
+     address newCampaign = new Campaign(minimun, msg.sender);
+     deployedCampaign.push(newCampaign);
+  }
+
+  function getDeployedCampaign() public view returns (address[]) {
+    return deployedCampaign;
+  }
+}
+
 contract Campaign {
    struct Request {
      string description;
@@ -16,7 +29,7 @@ contract Campaign {
    uint public minimunContribution;
    // address[] approvers;
    mapping(address => bool) public approvers;
-   Request[] requests;
+   Request[] public requests;
    uint public approversCount;
 
    modifier restricted() {
@@ -24,16 +37,17 @@ contract Campaign {
       _; // target function code 
    } 
 
-   function Campaign(uint minimun) public{
-        manager = msg.sender;
-        minimunContribution = minimun;
+   function Campaign(uint minimun, address creator) public {
+        // manager = msg.sender;
+        manager = creator ;
+        minimunContribution = minimun ;
    }
 
    function contribute() public payable {
    	// for validation
    	require(msg.value >= minimunContribution);
       // approvers.push(msg.sender);
-      approvers[msg.sender] = true;
+      approvers[msg.sender] = true ;
       approversCount++;
    } 
 
